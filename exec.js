@@ -4,10 +4,13 @@ export const execute = async (args) => {
   const _command = args[2];
   const _args = args.slice(3);
 
-  // command is aviailable
+  // command is available
   if (commands[_command]) {
+    /**
+     * @type {CommandResult}
+     */
     const _res = await commands[_command](_args);
-    console.log(_res);
+    console[_res.status ? "log" : "err"](_res.message);
   }
   // command is not available
   else {
