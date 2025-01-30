@@ -1,4 +1,4 @@
-import * as commands from "./commands.js";
+import * as commands from "./command/commands.js";
 
 export const execute = async (args) => {
   const _command = args[2];

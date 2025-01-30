@@ -14,6 +14,4 @@ export const login =
    * this command is used to login the user using google auth provied by firebase.
    * @returns {CommandResult} Logged in successfully!
    */
-  async () => {
-    return "Logged in successfully!";
-  };
+  async () => {};
