@@ -10,7 +10,7 @@ export const execute = async (args) => {
      * @type {CommandResult}
      */
     const _res = await commands[_command](_args);
-    console[_res.status ? "log" : "err"](_res.message);
+    // console[_res.status ? "log" : "err"](_res.message);
   }
   // command is not available
   else {
