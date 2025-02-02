@@ -1,4 +1,7 @@
+import { text } from "express";
 import { Colors } from "../utils/Colors.js";
+import { writeOutput } from "../utils/command_outputs.js";
+import { loaderAnimation } from "../utils/loadingSpinner.js";
 
 export class CommandResult {
   /**
@@ -13,6 +16,7 @@ export class CommandResult {
     this.warning = warning;
     this.color = Colors.NONE;
   }
+  printed() {}
 }
 export class FailedCommandResult extends CommandResult {
   /**
@@ -20,8 +24,8 @@ export class FailedCommandResult extends CommandResult {
    * @param {String} message
    */
   constructor(message, obj) {
-    this.color = Colors.RED;
     super(false, message, obj);
+    this.color = Colors.RED;
   }
 }
 export class SuccessCommandResult extends CommandResult {
@@ -31,24 +35,43 @@ export class SuccessCommandResult extends CommandResult {
    * @param {{warning:String}} obj
    */
   constructor(message, obj) {
-    this.color = Colors.GREEN;
     super(true, message, obj);
+    this.color = Colors.GREEN;
   }
 }
 export class PendingCommandResult extends CommandResult {
   /**
    * This represents pending commands
-   * @param {{warning:String}} obj
+   * @param {{
+   *          warning:String,
+   *          onCompleteTask:Function
+   *        }} obj
    */
-  constructor(message, { warning, onCompleteTask }) {
+  constructor(message, { warning, onCompleteTask, onFailTask }) {
     super(false, message);
     this.___onCompleteTask = onCompleteTask;
+    this.___onFailTask = onFailTask;
     this.warning = warning;
     this.color = Colors.YELLOW;
   }
 
-  complete() {
+  complete(val) {
+    this.color = Colors.GREEN;
     this.status = true;
-    this.___onCompleteTask();
+    this.message = this.___onCompleteTask(val);
+    process.stdout.write("\r" + writeOutput(this));
+    process.exit(0);
+  }
+
+  fail(val) {
+    this.color = Colors.RED;
+    this.status = false;
+    this.message = this.___onFailTask(val);
+    process.stdout.write("\r" + writeOutput(this));
+    process.exit(0);
+  }
+
+  printed() {
+    loaderAnimation({ text: "Loading..." });
   }
 }

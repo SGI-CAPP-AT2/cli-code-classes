@@ -10,8 +10,8 @@ export const startServer = (serverConfig) => {
   app.all("*", (req, res) => {
     serverConfig.executeOnPath(req.path, req, res);
   });
-  console.log("Server being started on port " + serverConfig.port);
+  // console.log("Server being started on port " + serverConfig.port);
   app.listen(serverConfig.port, () => {
-    console.log("Server started on port " + serverConfig.port);
+    // console.log("Server started on port " + serverConfig.port);
   });
 };
