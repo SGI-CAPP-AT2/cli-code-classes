@@ -4,7 +4,7 @@ export const LOGIN_PORT = 61109;
 export const SERVER_PORT = 3000;
 // PATHS FOR INSTALLATION
 export const INSTALL_DIR = import.meta.dirname;
-export const APP_DIR = path.join(import.meta.dirname, ".code_classes");
+export const APP_DIR = path.join(INSTALL_DIR, ".code_classes");
 // PATHS FOR USER DETAILS
 export const USER_DETAILS_DIR = path.join(APP_DIR, ".user");
 export const USER_DETAILS_FILE = path.join(USER_DETAILS_DIR, "user.json");

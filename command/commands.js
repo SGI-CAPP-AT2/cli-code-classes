@@ -21,7 +21,7 @@ import {
   getUserDetailsFromCache,
   getUserDetailsFromFetch,
 } from "../utils/user_details.js";
-import { User } from "../models/User.js";
+import { CommandInput } from "../models/CommanInput.js";
 export const hello =
   /**
    * This is simple command used for testing purpose.
@@ -29,17 +29,19 @@ export const hello =
    */
   async () => {
     const cachedDetails = getUserDetailsFromCache();
-    const output = `Hello ${cachedDetails ? cachedDetails.name : "World"}!`;
+    const output = `Hello ${
+      !cachedDetails.err ? cachedDetails.name : "World"
+    }!`;
     return new SuccessCommandResult(output);
   };
 
 export const login =
   /**
    * this command is used to login the user using google auth provied by firebase.
-   * @param { { user:User } } anonymous_0
+   * @param {CommandInput} anonymous_0
    * @returns {CommandResult} Logged in successfully!
    */
-  async ({ user }) => {
+  async ({ user, command }) => {
     if (!user.err) return new FailedCommandResult("Already Logged In !");
     const pendingRes = new PendingCommandResult(
       "Login is available at " + AUTH_URL,
@@ -50,11 +52,15 @@ export const login =
         onFailTask: (val) => {
           return "Unable to login " + val;
         },
+        command,
       }
     );
-    setTimeout(() => {
-      pendingRes.fail("Timed Out!");
-    }, 120 * 1000);
+    let timeOutCount = 120;
+    setInterval(() => {
+      if (timeOutCount-- == 0) pendingRes.fail("Timed Out!               ");
+    }, 1000);
+    pendingRes.textForLoaderAnimation = () =>
+      "Loading..., Will exit in " + timeOutCount + "s ";
     /**
      * @param {import("express").Request} req
      * @param {import("express").Response} res
@@ -81,6 +87,7 @@ export const login =
        */
       async (req, res) => {
         const userDetails = await getUserDetailsFromFetch();
+        if (userDetails.err) pendingRes.fail("Unexpected Error Occurred !");
         res.send(getPage(PAGES_LOGIN_SUCESS, userDetails));
         return userDetails;
       }
@@ -112,7 +119,7 @@ export const login =
 export const logout =
   /**
    * this command is used to logout the user.
-   * @param {{ user:User }} anonymous_0
+   * @param {CommandInput} anonymous_0
    * @returns {CommandResult} Logged in successfully!
    */
   async ({ user }) => {

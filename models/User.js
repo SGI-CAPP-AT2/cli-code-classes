@@ -1,7 +1,7 @@
 export class User {
   /**
    * Class which represents User
-   * @param {{ id : Number, picture : string, family_name : string, given_name : string, name : string, verified_email : boolean, email : string }} object
+   * @param {{ id : Number, picture : string, family_name : string, given_name : string, name : string, verified_email : boolean, email : string, err:boolean=false }} object
    */
   constructor({
     id,

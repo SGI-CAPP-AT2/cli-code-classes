@@ -5,16 +5,17 @@ import {
   USER_DETAILS_FILE,
   USER_TOKEN_FILE,
 } from "../GLOBALS.js";
-import fs, { existsSync, rm, rmdirSync } from "fs";
+import fs, { rm } from "fs";
 import { User } from "../models/User.js";
 export const getUserDetailsFromFetch = async () => {
+  if (!fs.existsSync(USER_TOKEN_FILE)) return new User({ err: true });
   const token = fs.readFileSync(USER_TOKEN_FILE).toString();
   const res = await fetch(
     GOOGLE_USER_DETAILS_API.replace("%ACCESS_TOKEN%", token)
   );
   const userDetails = await res.json();
   cacheUserDetails(userDetails);
-  return userDetails;
+  return new User(userDetails);
 };
 export const cacheUserDetails = async (userDetails) => {
   fs.writeFileSync(USER_DETAILS_FILE, JSON.stringify(userDetails));
