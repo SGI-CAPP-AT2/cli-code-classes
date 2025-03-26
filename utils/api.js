@@ -1,5 +1,5 @@
-const { API_FETCH } = require("../GLOBALS");
-const { Problem } = require("../../backend/models/Problem");
+import { API_ADD_PROB, API_FETCH } from "../GLOBALS.js";
+import prob from "../../backend/models/Problem.js";
 
 export const fetchProblem =
   /**
@@ -11,8 +11,22 @@ export const fetchProblem =
     try {
       const problem = await fetch(API_FETCH.replace("%PROBLEM_ID%", forid));
       const problem_json = await problem.json();
-      return new Problem(problem_json);
+      return new prob.Problem(problem_json);
     } catch (error) {
-      return new Problem({ err: error });
+      return new prob.Problem({ err: error });
     }
   };
+export const postProblem = async (prob) => {
+  try {
+    const res = await fetch(API_ADD_PROB, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }, // Add this line
+      body: JSON.stringify(prob),
+    });
+    const { id } = await res.json();
+    return id;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
+};

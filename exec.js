@@ -16,6 +16,7 @@ export const execute = async (args) => {
     const user = getUserDetailsFromCache();
     const token = getUserToken();
     const command = _command;
+    const cwd = process.cwd();
     /**
      * @type {CommandResult}
      */
@@ -25,6 +26,7 @@ export const execute = async (args) => {
         user,
         command,
         token,
+        cwd,
       })
     );
     console.log(writeOutput(_res));

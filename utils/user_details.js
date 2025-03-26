@@ -43,5 +43,5 @@ export const deleteUserDetails = async () => {
 export const getUserToken = () => {
   if (!fs.existsSync(USER_TOKEN_FILE)) return Token({ err: true });
   const token = fs.readFileSync(USER_TOKEN_FILE).toString();
-  return Token({ token });
+  return new Token({ token });
 };

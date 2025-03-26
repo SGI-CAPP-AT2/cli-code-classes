@@ -1,7 +1,7 @@
-const path = require("path");
-const { Problem } = require("../../backend/models/Problem");
-const fs = require("fs");
-const crypto = require("crypto");
+import { ASSETS_DIR } from "../GLOBALS.js";
+import path from "path";
+import { Problem } from "../../backend/models/Problem.js";
+import fs from "fs";
 
 export const saveProblem =
   /**
@@ -10,52 +10,31 @@ export const saveProblem =
   async (prob, dir) => {
     fs.writeFileSync(path.join(dir, "Question.txt"), prob.question);
     fs.writeFileSync(path.join(dir, "Solution.java"), prob.boiler);
-    prob.tests.forEach((test) => {
-      const hash = crypto.createHash("md5").update(test).digest("hex");
-      fs.writeFileSync(path.join(dir, "tests", hash + ".java"), test);
-    });
+    fs.writeFileSync(path.join(dir, "tests"), prob.tests);
   };
 
 export const compressProblem =
   /**
    * @return {Problem} prob
    */
-  async (dir) => {
-    const prob = new Problem();
-    prob.question = fs.readFileSync(path.join(dir, "Question.txt"));
-    prob.boiler = fs.writeFileSync(path.join(dir, "Solution.java"));
-    prob.tests = readJavaFilesToArray(dir);
+  (dir) => {
+    const prob = new Problem({ err: false });
+    prob.question = fs.readFileSync(path.join(dir, "Question.txt")).toString();
+    prob.boiler = fs.readFileSync(path.join(dir, "Solution.java")).toString();
+    prob.tests = fs.readFileSync(path.join(dir, "tests")).toString();
+    return prob;
   };
+export const initProblem = async (dir) => {
+  fs.writeFileSync(path.join(dir, "Question.txt"), "");
+  fs.writeFileSync(
+    path.join(dir, "Solution.java"),
+    fs.readFileSync(path.join(ASSETS_DIR, "Solution.java"))
+  );
+  fs.writeFileSync(path.join(dir, "tests"), "");
+};
 
-const readJavaFilesToArray = (directory) => {
-  const javaFileContents = [];
-
-  const processDirectory = (dir) => {
-    try {
-      const files = fs.readdirSync(dir);
-
-      files.forEach((file) => {
-        const filePath = path.join(dir, file);
-        const stats = fs.statSync(filePath);
-
-        if (stats.isDirectory()) {
-          processDirectory(filePath); // Recursive call
-        } else if (path.extname(file) === ".java") {
-          try {
-            const fileContent = fs.readFileSync(filePath, "utf8");
-            javaFileContents.push(fileContent);
-          } catch (readError) {
-            console.error(
-              `Error reading file ${filePath}: ${readError.message}`
-            );
-          }
-        }
-      });
-    } catch (dirError) {
-      console.error(`Error reading directory ${dir}: ${dirError.message}`);
-    }
-  };
-
-  processDirectory(directory);
-  return javaFileContents;
+export const discardProblem = async (dir) => {
+  fs.rmSync(path.join(dir, "Question.txt"));
+  fs.rmSync(path.join(dir, "Solution.java"));
+  fs.rmSync(path.join(dir, "tests"));
 };

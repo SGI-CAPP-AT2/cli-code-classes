@@ -23,8 +23,15 @@ import {
   getUserDetailsFromFetch,
 } from "../utils/user_details.js";
 import { CommandInput } from "../models/CommanInput.js";
-import { fetchProblem } from "../utils/api.js";
-import { saveProblem } from "../utils/fs_op.js";
+import { fetchProblem, postProblem } from "../utils/api.js";
+import {
+  compressProblem,
+  discardProblem,
+  initProblem,
+  saveProblem,
+} from "../utils/fs_op.js";
+import { runTests } from "../utils/executor.js";
+import path from "path";
 export const hello =
   /**
    * This is simple command used for testing purpose.
@@ -166,8 +173,50 @@ export const push =
    * @param {CommandInput} anonymous_0
    * @returns {CommandResult}
    */
-  async ({ token, args }) => {
+  async ({ token, cwd }) => {
     const failLoginReturn = new FailedCommandResult(
       "Unable to logout ! May be you're not logged in."
     );
+    if (token.err) return failLoginReturn;
+    const prob = compressProblem(cwd);
+    const id = await postProblem(prob);
+    if (id)
+      return new SuccessCommandResult(
+        "Question pushed with id: " +
+          id +
+          "\nPlease note this id for future reference or question will be lost"
+      );
+    return new FailedCommandResult("Unable to push question");
+  };
+
+export const add =
+  /**
+   * this command is used to add questions
+   * @param {CommandInput} anonymous_0
+   * @returns {CommandResult}
+   */
+  async ({ cwd }) => {
+    initProblem(cwd);
+    return new SuccessCommandResult("Problem added in this directory");
+  };
+
+export const discard =
+  /**
+   * this command is used to add questions
+   * @param {CommandInput} anonymous_0
+   * @returns {CommandResult}
+   */
+  async ({ cwd }) => {
+    discardProblem(cwd);
+    return new SuccessCommandResult("Problem discarded from this directory");
+  };
+
+export const test =
+  /**
+   * this command is used to test questions
+   * @param {CommandInput} anonymous_0
+   * @returns {CommandResult}
+   */
+  async ({ cwd }) => {
+    return new SuccessCommandResult(runTests(cwd));
   };
