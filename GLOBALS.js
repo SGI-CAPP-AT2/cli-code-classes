@@ -20,5 +20,6 @@ export const GOOGLE_USER_DETAILS_API =
 export const AUTH_URL = `http://localhost:${SERVER_PORT}/auth/google`;
 
 export const API_BASE = `http://localhost:${SERVER_PORT}/`;
-export const API_FETCH = `http://localhost:${SERVER_PORT}/fetch/%PROBLEM_ID%`;
+export const API_FETCH = `http://localhost:${SERVER_PORT}/fetch/problems/%PROBLEM_ID%`;
 export const API_ADD_PROB = `http://localhost:${SERVER_PORT}/add/problem`;
+export const API_ADD_SOL = `http://localhost:${SERVER_PORT}/add/solution`;

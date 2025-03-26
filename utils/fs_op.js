@@ -1,7 +1,8 @@
 import { ASSETS_DIR } from "../GLOBALS.js";
 import path from "path";
-import { Problem } from "../../backend/models/Problem.js";
+import { Problem } from "../models/Problem.js";
 import fs from "fs";
+import { Solution } from "../models/Solution.js";
 
 export const saveProblem =
   /**
@@ -23,6 +24,17 @@ export const compressProblem =
     prob.boiler = fs.readFileSync(path.join(dir, "Solution.java")).toString();
     prob.tests = fs.readFileSync(path.join(dir, "tests")).toString();
     return prob;
+  };
+
+export const compressSolution =
+  /**
+   * @return {Solution} sol
+   */
+  (dir) => {
+    const solu = new Solution({ err: false });
+    solu.problem = fs.readFileSync(path.join(dir, "id")).toString();
+    solu.code = fs.readFileSync(path.join(dir, "Solution.java")).toString();
+    return solu;
   };
 export const initProblem = async (dir) => {
   fs.writeFileSync(path.join(dir, "Question.txt"), "");

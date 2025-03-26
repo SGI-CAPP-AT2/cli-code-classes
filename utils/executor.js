@@ -2,6 +2,7 @@ import { chdir } from "process";
 
 import { execSync } from "child_process";
 import fs from "fs";
+import path from "path";
 
 export function runTests(cwd) {
   const javaFilePath = path.join(cwd, "Solution.java");
@@ -26,14 +27,27 @@ export function runTests(cwd) {
     const { dataType, input, expectedOutput } = tests[i];
     let formattedInput = formatInput(input, dataType);
     try {
-      let output = execSync(`java Solution ${dataType} ${formattedInput}`)
+      let output = execSync(`java Solution ${dataType} "${formattedInput}"`)
         .toString()
         .trim();
       if (output !== expectedOutput.join("\n")) {
-        return { success: false, failedTestIndex: i + 1 };
+        return {
+          success: false,
+          failedTestIndex: i + 1,
+          input: input,
+          expectedOutput: expectedOutput,
+          output: output,
+        };
       }
     } catch (err) {
-      return { success: false, failedTestIndex: i + 1, error: "Runtime Error" };
+      return {
+        success: false,
+        failedTestIndex: i + 1,
+        error: "Runtime Error",
+        input: input,
+        expectedOutput: expectedOutput,
+        output: err.stdout.toString(),
+      };
     }
   }
 
